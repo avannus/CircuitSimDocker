@@ -3,7 +3,7 @@
 release="stable"
 imageBaseName="avannus/circuit-sim"
 imageName="${imageBaseName}:${release}"
-hostDir="/host/"
+hostDir="/config/host/"
 GT2110Container="gtcs2110/cs2110docker"
 p1=5800
 p2=5900
@@ -15,7 +15,7 @@ description="Update and Run a $imageBaseName container"
 usage_text=""
 define usage_text <<'EOF'
 USAGE:
-    ./launchDocker.sh [start|stop|-h|-t]
+    ./CircuitSimDocker.sh [start|stop|-h|-t]
 
 OPTIONS:
     start (default)

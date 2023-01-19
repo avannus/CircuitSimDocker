@@ -97,6 +97,6 @@ echo -e "\n-----Done Pushing-----\n\n\n-----Starting Pull-----\n"
 
 # Move dir so mount works, use start script to pull and run image
 cd ..
-time ./launchDocker.sh -t
+time ./CircuitSimDocker.sh -t
 cd docker
 echo -e "\n-----Done Pulling-----\n"
