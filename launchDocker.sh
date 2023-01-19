@@ -79,6 +79,7 @@ if ! docker container ls >/dev/null; then
 fi
 echo "Found Docker Installation. Checking for existing containers."
 
+### Check for existing containers ###
 existingContainers=($(docker ps -a | grep "$imageBaseName" | awk '{print $1}'))
 echo "${existingContainers[@]}"
 if [ "${#existingContainers[@]}" -ne 0 ]; then
@@ -89,6 +90,7 @@ else
   echo "No existing $imageBaseName containers."
 fi
 
+### Check for existing GT2110 containers ###
 existingContainers=($(docker ps -a | grep "$GT2110Container" | awk '{print $1}'))
 echo "${existingContainers[@]}"
 if [ "${#existingContainers[@]}" -ne 0 ]; then
@@ -126,13 +128,19 @@ else
   currDir="/$(pwd -W 2>/dev/null || pwd)"
 fi
 
-docker run -d -p $ipAddress:$p1:$p1 -p $ipAddress:$p2:$p2 -v "$currDir":$hostDir --cap-add=SYS_PTRACE --security-opt seccomp=unconfined "$imageName"
+docker run -d \
+-p $ipAddress:$p1:$p1 \
+-p $ipAddress:$p2:$p2 \
+-v "$currDir":$hostDir \
+--cap-add=SYS_PTRACE \
+--security-opt seccomp=unconfined \
+"$imageName"
 
 successfulRun=$?
 
 if [ $successfulRun = 0 ]; then
   echo -e "\nSuccessfully launched $imageName Docker container.\nPlease go to http://$ipAddress:$p1/ to access it."
 else
-  >&2 echo "ERROR: Unable to launch $imageName Docker container."
+  >&2 echo -e "ERROR: Unable to launch $imageName Docker container.\n $?"
 fi
 

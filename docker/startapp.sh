@@ -1,4 +1,5 @@
 #!/bin/sh
+# exec /usr/bin/xterm
 
 export HOME=/config
 
