@@ -43,5 +43,3 @@ Double click the CircuitSim window to maximize.
 The images are hosted at <https://hub.docker.com/r/avannus/circuit-sim>
 
 The script currently closes GTCS2110 containers to ensure performance and possibly compatibility.
-
-<!-- `docker run --rm --privileged multiarch/qemu-user-static --reset -p yes && docker buildx build --platform linux/amd64,linux/arm64 -t avannus/circuit-sim:stable --push .` -->
