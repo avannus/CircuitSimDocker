@@ -1,23 +1,19 @@
 # Pull base image.
-FROM jlesage/baseimage-gui:ubuntu-20.04-v4
+FROM jlesage/baseimage-gui:alpine-3.17-v4
 
-RUN apt-get update -y
-RUN apt-get upgrade -y
+# Enable testing, update and upgrade current packages, install openjdk17 and openjfx.
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+RUN apk update && apk upgrade
+RUN apk add openjdk17
+RUN apk add openjfx
 
-RUN apt-get install -y openjdk-17-jdk\
-  && apt-get install -y openjfx
-
-RUN apt-get install -y wget
+# Download CircuitSim.
 RUN wget https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.9.0 -O /CircuitSim
 
-RUN apt-get update -y\
-  && apt-get upgrade -y\
-  && apt-get clean -y
-
-# Copy the start script.
+# Copy the start script and window script.
 COPY startapp.sh /startapp.sh
 COPY main-window-selection.xml /etc/openbox/main-window-selection.xml
 
-# # Set the name of the application.
+# Set the name of the application.
 RUN set-cont-env APP_NAME "CircuitSim"
 
