@@ -16,7 +16,7 @@ curl https://raw.githubusercontent.com/avannus/CircuitSimDocker/main/CircuitSimD
 
 There is now an executable script wherever you ran the command above. Feel free to move it around to where you would like to have file access.
 
-The script itself should probably ask for an update when needed but #TODO
+The script itself should probably ask for you to re-download if needed but #TODO
 
 ### Run the Script
 
