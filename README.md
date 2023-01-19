@@ -30,7 +30,7 @@ The URL that the container is running should be printed out at the bottom.
 
 ### Using the Container
 
-You can load and save files by clicking `Home` on the left of file selection and choosing `host` (`/config/host/`). This will be whichever directory you ran the script from on your machine.
+You can load and save files by clicking `Home` on the left of file selection and choosing `host` (`/config/host/`). This directory will be whichever directory you ran the script from on your machine.
 
 Select "Scaling Mode: Remote Resizing" from the left to scale based on your browser.
 
