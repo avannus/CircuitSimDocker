@@ -24,8 +24,6 @@ To run, ensure Docker is running, open a terminal to the directory where the scr
 
 The URL that the container is running should be printed out at the bottom.
 
-* `CMD + Double Click` terminal links on MacOS
-
 ### Using the Container
 
 You can load and save files by clicking `Home` on the left of file selection and choosing `host` (`/config/host/`). This directory will be whichever directory you ran the script from on your machine.
@@ -39,6 +37,8 @@ Double click the CircuitSim window to maximize.
 There is now an executable script wherever you ran the first command. Move it to where you would like to have file access from your machine.
 
 The script should always work but won't auto-update #TODO
+
+`CMD + Double Click` terminal links on MacOS
 
 The Docker images are hosted at <https://hub.docker.com/r/avannus/circuit-sim>
 
