@@ -14,10 +14,6 @@ Open a terminal in your project directory (class folder) and type in the followi
 curl https://raw.githubusercontent.com/avannus/CircuitSimDocker/main/CircuitSimDocker.sh --output CircuitSimDocker.sh && chmod +x CircuitSimDocker.sh
 ```
 
-There is now an executable script wherever you ran the command above. Move it to where you would like to have file access from your machine.
-
-The script should always work but won't auto-update #TODO
-
 ### Run the Script
 
 To run, ensure Docker is running, open a terminal to the directory where the script now resides, and run the script:
@@ -40,9 +36,13 @@ Double click the CircuitSim window to maximize.
 
 ## Misc Info
 
-The images are hosted at <https://hub.docker.com/r/avannus/circuit-sim>
+There is now an executable script wherever you ran the first command. Move it to where you would like to have file access from your machine.
 
-The script currently closes GTCS2110 containers to ensure performance and possibly compatibility.
+The script should always work but won't auto-update #TODO
+
+The Docker images are hosted at <https://hub.docker.com/r/avannus/circuit-sim>
+
+The script currently closes any running GTCS2110 containers to ensure performance and possibly compatibility, can remove if that's necessary.
 
 Show script help with:
 
