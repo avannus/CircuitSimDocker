@@ -30,9 +30,10 @@ else
     diff $SAVE_AS $SAVE_AS_NEW
     echo -e "\n"
     read -p "There is a new version of the script (diff above), would you like to update it before running? (you can view the new file at $(pwd)/$SAVE_AS_NEW) [y/N] " -n 1 -r
+    echo -e "\n"
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
-        echo -e "\nUpdating Script"
+        echo -e "Updating Script"
         mv $SAVE_AS $SAVE_AS.bak
         mv $SAVE_AS_NEW $SAVE_AS
         chmod +x $SAVE_AS
@@ -40,7 +41,7 @@ else
         ./$SAVE_AS $@
         exit 0
     else
-        echo -e "\nNot updating script"
+        echo -e "Not updating script"
     fi
   else 
     echo -e "No update found"
