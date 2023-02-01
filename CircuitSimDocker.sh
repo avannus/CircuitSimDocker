@@ -32,11 +32,15 @@ else
     read -p "There is a new version of the script (diff above), would you like to update it before running? (you can view the new file at $(pwd)/$SAVE_AS_NEW) [y/N] " -n 1 -r
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
+        echo -e "\nUpdating Script"
+        mv $SAVE_AS $SAVE_AS.bak
         mv $SAVE_AS_NEW $SAVE_AS
         chmod +x $SAVE_AS
-        echo -e "Updated Script, running new version now:\n\n"
+        echo -e "Backed up current script as $SAVE_AS.bak, updated current script, running new version now:\n\n"
         ./$SAVE_AS $@
         exit 0
+    else
+        echo -e "\nNot updating script"
     fi
   else 
     echo -e "No update found"
