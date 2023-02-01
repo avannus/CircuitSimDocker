@@ -69,6 +69,9 @@ print_help() {
 print_usage() {
   >&2 echo "$usage_text"
 }
+echo -e "\n\n\n\n\n\n\n\n\n\n\n"
+echo $1
+echo $2
 
 action=""
 if [ $# -eq 0 ]; then
@@ -91,9 +94,10 @@ elif [ $# -eq 1 ]; then
       imageName="${imageBaseName}:${release}"
       ;;
     --tag)
-      action="start"
-      release=$1
-      imageName="${imageBaseName}:${release}"
+      >&2 echo "Error: Please specify a tag to use"
+      >&2 echo ""
+      print_usage
+      exit 1
       ;;
     *)
       >&2 echo "Error: unrecognized argument: $1"
@@ -102,6 +106,25 @@ elif [ $# -eq 1 ]; then
       exit 1
       ;;
   esac
+elif [ $# -eq 2 ]; then
+  case "$1" in
+    --tag)
+      action="start"
+      release="$2"
+      imageName="${imageBaseName}:${release}"
+      ;;
+    *)
+      >&2 echo "Error: Incorrect usage"
+      >&2 echo ""
+      print_usage
+      exit 1
+      ;;
+  esac
+else
+  >&2 echo "Error: too many arguments"
+  >&2 echo ""
+  print_usage
+  exit 1
 fi
 
 ### Check for Docker ###
