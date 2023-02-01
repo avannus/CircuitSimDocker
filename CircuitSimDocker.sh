@@ -30,7 +30,7 @@ if [ ! -z "$diff" ]; then
   then
       mv $SAVE_AS_NEW $SAVE_AS
       chmod +x $SAVE_AS
-      echo -e "Updated Script, running new version"
+      echo -e "Updated Script, running new version now:\n\n"
       ./$SAVE_AS $@
       exit 0
   fi
