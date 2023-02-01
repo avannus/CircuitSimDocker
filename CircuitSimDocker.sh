@@ -18,10 +18,11 @@ function cleanup {
 trap cleanup EXIT
 
 ### Check for updates ###
+echo -e "\n-----Checking for updates-----\n"
 curl -LJo $SAVE_AS_NEW $SCRIPT_LINK
 diff=$(diff $SAVE_AS $SAVE_AS_NEW)
 if [ ! -z "$diff" ]; then
-  echo -e "\nUpdate! See the changes below:\n"
+  echo -e "\nUpdate found! See the changes below:\n"
   diff $SAVE_AS $SAVE_AS_NEW
   read -p "There is a new version of the script (diff above), would you like to update it before running? [y/N] " -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]
@@ -32,6 +33,8 @@ if [ ! -z "$diff" ]; then
       ./$SAVE_AS $@
       exit 0
   fi
+else 
+  echo -e "\n-----No update found-----\n"
 fi
 
 define() { IFS=$'\n' read -r -d '' "${1}" || true; }
