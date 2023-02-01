@@ -8,7 +8,7 @@ p1=5800
 p2=5900
 SCRIPT_LINK="https://raw.githubusercontent.com/avannus/CircuitSimDocker/main/CircuitSimDocker.sh"
 SAVE_AS=$(basename "$0")
-SAVE_AS_NEW="${SAVE_AS_NEW}.new"
+SAVE_AS_NEW="$SAVE_AS.new"
 
 function cleanup {
   echo -e "\n-----Cleaning up-----\n"
@@ -18,12 +18,12 @@ function cleanup {
 trap cleanup EXIT
 
 ### Check for updates ###
-echo -e "\nChecking for script updates\n"
-curl $SCRIPT_LINK -o $SAVE_AS_NEW
+curl -LJo $SAVE_AS_NEW $SCRIPT_LINK
+exit 0
 diff=$(diff $SAVE_AS $SAVE_AS_NEW)
 if [ ! -z "$diff" ]; then
-  echo -e "Update! See the changes below:"
-  echo $diff
+  echo -e "\nUpdate! See the changes below:\n"
+  diff $SAVE_AS $SAVE_AS_NEW
   read -p "There is a new version of the script (diff above), would you like to update it before running? [y/N] " -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]
   then
@@ -33,8 +33,6 @@ if [ ! -z "$diff" ]; then
       ./$SAVE_AS $@
       exit 0
   fi
-else 
-  echo -e "\nNo updates found\n"
 fi
 
 define() { IFS=$'\n' read -r -d '' "${1}" || true; }
