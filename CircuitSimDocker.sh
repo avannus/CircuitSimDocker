@@ -70,9 +70,6 @@ print_help() {
 print_usage() {
   >&2 echo "$usage_text"
 }
-echo -e "\n\n\n\n\n\n\n\n\n\n\n"
-echo $1
-echo $2
 
 action=""
 if [ $# -eq 0 ]; then
