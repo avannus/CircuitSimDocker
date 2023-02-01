@@ -18,24 +18,29 @@ function cleanup {
 trap cleanup EXIT
 
 ### Check for updates ###
-echo -e "Checking for updates"
-curl -LJo $SAVE_AS_NEW $SCRIPT_LINK
-diff=$(diff $SAVE_AS $SAVE_AS_NEW)
-if [ ! -z "$diff" ]; then
-  echo -e "\nUpdate found! See the changes below:\n"
-  diff $SAVE_AS $SAVE_AS_NEW
-  echo -e "\n"
-  read -p "There is a new version of the script (diff above), would you like to update it before running? (you can view the new file at $(pwd)/$SAVE_AS_NEW) [y/N] " -n 1 -r
-  if [[ $REPLY =~ ^[Yy]$ ]]
-  then
-      mv $SAVE_AS_NEW $SAVE_AS
-      chmod +x $SAVE_AS
-      echo -e "Updated Script, running new version now:\n\n"
-      ./$SAVE_AS $@
-      exit 0
+if ! command -v curl &> /dev/null
+then
+    echo "curl could not be found, skipping script update check. Download curl to enable this feature. Docker will still be updated if needed."
+else
+  echo -e "Checking for updates"
+  curl -LJo $SAVE_AS_NEW $SCRIPT_LINK
+  diff=$(diff $SAVE_AS $SAVE_AS_NEW)
+  if [ ! -z "$diff" ]; then
+    echo -e "\nUpdate found! See the changes below:\n"
+    diff $SAVE_AS $SAVE_AS_NEW
+    echo -e "\n"
+    read -p "There is a new version of the script (diff above), would you like to update it before running? (you can view the new file at $(pwd)/$SAVE_AS_NEW) [y/N] " -n 1 -r
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        mv $SAVE_AS_NEW $SAVE_AS
+        chmod +x $SAVE_AS
+        echo -e "Updated Script, running new version now:\n\n"
+        ./$SAVE_AS $@
+        exit 0
+    fi
+  else 
+    echo -e "No update found"
   fi
-else 
-  echo -e "No update found"
 fi
 
 define() { IFS=$'\n' read -r -d '' "${1}" || true; }
