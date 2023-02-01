@@ -11,14 +11,14 @@ SAVE_AS=$(basename "$0")
 SAVE_AS_NEW="$SAVE_AS.new"
 
 function cleanup {
-  echo -e "\n-----Cleaning up-----\n"
+  echo -e "Cleaning up"
   rm -v $SAVE_AS_NEW
-  echo -e "\n-----Done Cleaning-----\n"
+  echo -e "Done Cleaning"
 }
 trap cleanup EXIT
 
 ### Check for updates ###
-echo -e "\n-----Checking for updates-----\n"
+echo -e "Checking for updates"
 curl -LJo $SAVE_AS_NEW $SCRIPT_LINK
 diff=$(diff $SAVE_AS $SAVE_AS_NEW)
 if [ ! -z "$diff" ]; then
@@ -29,12 +29,12 @@ if [ ! -z "$diff" ]; then
   then
       mv $SAVE_AS_NEW $SAVE_AS
       chmod +x $SAVE_AS
-      echo -e "\n-----Updated Script-----\n"
+      echo -e "Updated Script, running new version"
       ./$SAVE_AS $@
       exit 0
   fi
 else 
-  echo -e "\n-----No update found-----\n"
+  echo -e "No update found"
 fi
 
 define() { IFS=$'\n' read -r -d '' "${1}" || true; }
