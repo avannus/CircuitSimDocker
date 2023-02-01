@@ -18,8 +18,8 @@ function cleanup {
 trap cleanup EXIT
 
 ### Check for updates ###
-echo "Checking for script updates"
-curl $SAVE_AS -o $SAVE_AS_NEW
+echo -e "\nChecking for script updates\n"
+curl $SCRIPT_LINK -o $SAVE_AS_NEW
 diff=$(diff $SAVE_AS $SAVE_AS_NEW)
 if [ ! -z "$diff" ]; then
   echo -e "Update! See the changes below:"
@@ -33,6 +33,8 @@ if [ ! -z "$diff" ]; then
       ./$SAVE_AS $@
       exit 0
   fi
+else 
+  echo -e "\nNo updates found\n"
 fi
 
 define() { IFS=$'\n' read -r -d '' "${1}" || true; }
