@@ -2,13 +2,14 @@
 
 # Run this file to test your Dockerfile
 # Builds, pushes to :testing, and runs the container
+
 set -e
 
-function cleanup {
-  echo -e "\n\n\n-----Cleaning up-----\n"
-  echo -e "\n\n\n-----Done Cleaning-----\n"
-}
-trap cleanup EXIT
+# function cleanup {
+#   echo -e "\n\n\n-----Cleaning up-----\n"
+#   echo -e "\n\n\n-----Done Cleaning-----\n"
+# }
+# trap cleanup EXIT
 
 link="https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.9.1"
 name="CircuitSim1.9.1"
@@ -94,13 +95,24 @@ else
   fi
 fi
 
+# Ensure docker is installed
+if ! command -v docker &> /dev/null
+then
+  echo "docker could not be found"
+  exit
+fi
+
+# Ensure docker buildx is installed
+if ! command -v docker buildx &> /dev/null
+then
+  echo "docker buildx could not be found"
+  exit
+fi
+
 # Ensure any architechture can be built
 if ! docker buildx ls | grep -q "CircuitSimBuilder"; then
   echo -e "\n-----Starting init. dep. for build-----\n"
-  time docker buildx create --name CircuitSimBuilder --driver docker-container --bootstrap
-else
-  echo -e "\n-----CircuitSimBuilder found, using it-----\n"
-  time docker buildx use CircuitSimBuilder
+  time docker buildx create --name CircuitSimBuilder --driver docker-container
 fi
 
 echo -e "\n-----Done init. dep. for build-----\n\n\n-----Starting Build-----\n"

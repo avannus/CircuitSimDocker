@@ -1,13 +1,13 @@
 #!/bin/bash
-
 # Run this file to build all containers
+
 set -e
 
-function cleanup {
-  echo -e "\n-----Cleaning up-----\n"
-  echo -e "\n-----Done Cleaning-----\n"
-}
-trap cleanup EXIT
+# function cleanup {
+#   echo -e "\n-----Cleaning up-----\n"
+#   echo -e "\n-----Done Cleaning-----\n"
+# }
+# trap cleanup EXIT
 
 DOCKER_REPO="avannus/circuit-sim"
 #ARCH is the architectures to build

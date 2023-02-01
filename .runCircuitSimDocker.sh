@@ -14,7 +14,7 @@ description="Update and Run a $imageBaseName container"
 usage_text=""
 define usage_text <<'EOF'
 USAGE:
-    ./CircuitSimDocker.sh [start|stop|-h|--testing|--tag]
+    ./$0 [start|stop|-h|--testing|--tag]
 
 OPTIONS:
     start (default)
@@ -41,7 +41,6 @@ print_usage() {
 }
 
 action=""
-echo "::::: $# $1 $2 :::::."
 if [ $# -eq 0 ]; then
   action="start"
 elif [ $# -eq 1 ]; then
@@ -88,7 +87,6 @@ echo "Found Docker Installation. Checking for existing containers."
 
 ### Check for existing containers ###
 existingContainers=($(docker ps -a | grep "$imageBaseName" | awk '{print $1}'))
-echo "${existingContainers[@]}"
 if [ "${#existingContainers[@]}" -ne 0 ]; then
   echo "Found $imageBaseName containers. Stopping and removing them."
   docker stop "${existingContainers[@]}" >/dev/null
