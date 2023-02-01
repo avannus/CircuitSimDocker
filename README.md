@@ -11,7 +11,7 @@ Tested on Linux (x86_64/AMD64) and an M1 MacBook Air (ARM64).
 Open a terminal in your project directory (class folder) and type in the following command:
 
 ```bash
-curl https://raw.githubusercontent.com/avannus/CircuitSimDocker/main/CircuitSimUpdateAndRun.sh --output CircuitSim.sh && chmod +x CircuitSim.sh
+curl https://raw.githubusercontent.com/avannus/CircuitSimDocker/main/CircuitSimDocker.sh --output CircuitSim.sh && chmod +x CircuitSim.sh
 ```
 
 ### Run the Script

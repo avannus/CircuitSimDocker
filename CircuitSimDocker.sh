@@ -6,6 +6,34 @@ imageName="${imageBaseName}:${release}"
 hostDir="/config/host/"
 p1=5800
 p2=5900
+SCRIPT_LINK="https://raw.githubusercontent.com/avannus/CircuitSimDocker/main/CircuitSimDocker.sh"
+SAVE_AS=$(basename "$0")
+SAVE_AS_NEW="${SAVE_AS_NEW}.new"
+
+function cleanup {
+  echo -e "\n-----Cleaning up-----\n"
+  rm -v $SAVE_AS_NEW
+  echo -e "\n-----Done Cleaning-----\n"
+}
+trap cleanup EXIT
+
+### Check for updates ###
+echo "Checking for script updates"
+curl $SAVE_AS -o $SAVE_AS_NEW
+diff=$(diff $SAVE_AS $SAVE_AS_NEW)
+if [ ! -z "$diff" ]; then
+  echo -e "Update! See the changes below:"
+  echo $diff
+  read -p "There is a new version of the script (diff above), would you like to update it before running? [y/N] " -n 1 -r
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+      mv $SAVE_AS_NEW $SAVE_AS
+      chmod +x $SAVE_AS
+      echo -e "\n-----Updated Script-----\n"
+      ./$SAVE_AS $@
+      exit 0
+  fi
+fi
 
 define() { IFS=$'\n' read -r -d '' "${1}" || true; }
 
