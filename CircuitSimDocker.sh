@@ -24,6 +24,7 @@ diff=$(diff $SAVE_AS $SAVE_AS_NEW)
 if [ ! -z "$diff" ]; then
   echo -e "\nUpdate found! See the changes below:\n"
   diff $SAVE_AS $SAVE_AS_NEW
+  echo -e "\n"
   read -p "There is a new version of the script (diff above), would you like to update it before running? (you can view the new file at $(pwd)/$SAVE_AS_NEW) [y/N] " -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]
   then
