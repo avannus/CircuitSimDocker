@@ -19,7 +19,6 @@ trap cleanup EXIT
 
 ### Check for updates ###
 curl -LJo $SAVE_AS_NEW $SCRIPT_LINK
-exit 0
 diff=$(diff $SAVE_AS $SAVE_AS_NEW)
 if [ ! -z "$diff" ]; then
   echo -e "\nUpdate! See the changes below:\n"
