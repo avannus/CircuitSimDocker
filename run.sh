@@ -4,7 +4,6 @@ release="stable"
 imageBaseName="avannus/circuit-sim"
 imageName="${imageBaseName}:${release}"
 hostDir="/config/host/"
-GT2110Container="gtcs2110/cs2110docker"
 p1=5800
 p2=5900
 
@@ -15,7 +14,7 @@ description="Update and Run a $imageBaseName container"
 usage_text=""
 define usage_text <<'EOF'
 USAGE:
-    ./CircuitSimDocker.sh [start|stop|-h|-t]
+    ./CircuitSimDocker.sh [start|stop|-h|--testing|--tag]
 
 OPTIONS:
     start (default)
@@ -27,8 +26,10 @@ OPTIONS:
             Stop and remove any running instances of the container.
     -h, --help
             Show this help text.
-    -t, --testing
+    --testing
             Pull and run the testing version of the container.
+    --tag
+            Pull and run the specified version of the container.
 EOF
 
 print_help() {
@@ -40,6 +41,7 @@ print_usage() {
 }
 
 action=""
+echo "::::: $# $1 $2 :::::."
 if [ $# -eq 0 ]; then
   action="start"
 elif [ $# -eq 1 ]; then
@@ -54,9 +56,14 @@ elif [ $# -eq 1 ]; then
       print_help
       exit 0
       ;;
-    -t|--testing)
+    --testing)
       action="start"
       release="testing"
+      imageName="${imageBaseName}:${release}"
+      ;;
+    --tag)
+      action="start"
+      release=$1
       imageName="${imageBaseName}:${release}"
       ;;
     *)
@@ -88,22 +95,6 @@ if [ "${#existingContainers[@]}" -ne 0 ]; then
   docker rm "${existingContainers[@]}" >/dev/null
 else
   echo "No existing $imageBaseName containers."
-fi
-
-### Check for existing GT2110 containers ###
-existingContainers=($(docker ps -a | grep "$GT2110Container" | awk '{print $1}'))
-echo "${existingContainers[@]}"
-if [ "${#existingContainers[@]}" -ne 0 ]; then
-  echo "Found $GT2110Container containers. Stopping and removing them."
-  docker stop "${existingContainers[@]}" >/dev/null
-  docker rm "${existingContainers[@]}" >/dev/null
-else
-  echo "No existing $GT2110Container containers."
-fi
-
-if [ "$action" = "stop" ]; then
-  echo "Successfully stopped $GT2110Container containers"
-  exit 0
 fi
 
 echo "Pulling down most recent image of $imageName"

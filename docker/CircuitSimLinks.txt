@@ -1,0 +1,16 @@
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.5.6
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.6.0
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.6.1
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.6.2
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.7.0
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.7.1
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.7.2
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.7.3
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.7.4
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.8.0
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.8.1
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.8.2
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.8.3
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.8.5
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.9.0
+https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.9.1

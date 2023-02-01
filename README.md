@@ -11,7 +11,7 @@ Tested on Linux (x86_64/AMD64) and an M1 MacBook Air (ARM64).
 Open a terminal in your project directory (class folder) and type in the following command:
 
 ```bash
-curl https://raw.githubusercontent.com/avannus/CircuitSimDocker/main/CircuitSimDocker.sh --output CircuitSimDocker.sh && chmod +x CircuitSimDocker.sh
+curl https://raw.githubusercontent.com/avannus/CircuitSimDocker/main/CircuitSimUpdateAndRun.sh --output CircuitSim.sh && chmod +x CircuitSim.sh
 ```
 
 ### Run the Script
@@ -19,7 +19,7 @@ curl https://raw.githubusercontent.com/avannus/CircuitSimDocker/main/CircuitSimD
 To run, ensure Docker is running, open a terminal to the directory where the script now resides, and run the script:
 
 ```bash
-./CircuitSimDocker.sh
+./CircuitSim.sh
 ```
 
 The URL that the container is running should be printed out at the bottom.
@@ -36,16 +36,14 @@ Double click the CircuitSim window to maximize.
 
 There is now an executable script wherever you ran the first command. Move it to where you would like to have file access from your machine.
 
-The script should always work but won't auto-update #TODO
+You can use docker-desktop or VSCode w/ extensions to manage containers
 
 `CMD + Double Click` terminal links on MacOS
 
 The Docker images are hosted at <https://hub.docker.com/r/avannus/circuit-sim>
 
-The script currently closes any running GTCS2110 containers to ensure performance and possibly compatibility, can remove if that's necessary.
-
 Show script help with:
 
 ```bash
-./CircuitSimDocker.sh -h
+./CircuitSim.sh -h
 ```

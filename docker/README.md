@@ -1,6 +1,6 @@
 # Updating the Docker
 
-run `./testing.sh` to make tests, run `CircuitSimDocker.sh -t` to run the most recent test.
+run `./testing.sh` to make tests, run `CircuitSimDocker.sh -t` to run the most recent test. Run `./buildAll.sh` to build and push all available versions of CircuitSim.
 
 ## Push to stable
 

@@ -4,6 +4,15 @@
 # Builds, pushes to :testing, and runs the container
 set -e
 
+function cleanup {
+  echo -e "\n\n\n-----Cleaning up-----\n"
+  echo -e "\n\n\n-----Done Cleaning-----\n"
+}
+trap cleanup EXIT
+
+link="https://www.roiatalla.com/public/CircuitSim/Linux/CircuitSim1.9.1"
+name="CircuitSim1.9.1"
+
 # Help
 define() { IFS=$'\n' read -r -d '' "${1}" || true; }
 usage_text=""
@@ -86,17 +95,31 @@ else
 fi
 
 # Ensure any architechture can be built
-time docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+if ! docker buildx ls | grep -q "CircuitSimBuilder"; then
+  echo -e "\n-----Starting init. dep. for build-----\n"
+  time docker buildx create --name CircuitSimBuilder --driver docker-container --bootstrap
+else
+  echo -e "\n-----CircuitSimBuilder found, using it-----\n"
+  time docker buildx use CircuitSimBuilder
+fi
 
 echo -e "\n-----Done init. dep. for build-----\n\n\n-----Starting Build-----\n"
 
 # Build image for specified platform, default of amd64
-time docker buildx build --platform $ARCH -t avannus/circuit-sim:testing --push . $NO_CACHE
+time docker buildx build \
+  --builder CircuitSimBuilder \
+  --platform $ARCH \
+  -t avannus/circuit-sim:testing \
+  --push \
+  --build-arg LINK=$link \
+  --build-arg NAME=$name \
+  . $NO_CACHE
 
-echo -e "\n-----Done Pushing-----\n\n\n-----Starting Pull-----\n"
+
+echo -e "\n-----Done Building-----\n\n\n-----Starting Pull-----\n"
 
 # Move dir so mount works, use start script to pull and run image
 cd ..
-time ./CircuitSimDocker.sh -t
+time ./CircuitSimDocker.sh --testing
 cd docker
-echo -e "\n-----Done Pulling-----\n"
+echo -e "\n-----Done Pulling-----"
