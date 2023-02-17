@@ -1,6 +1,8 @@
 # CircuitSimDocker
 
-A Dockerfile (and supporting files) to build a Docker image for CircuitSim.
+A lightweight, browser-accessed Docker image for [ra4king's CircuitSim](https://github.com/ra4king/CircuitSim).
+
+See images for each available release [here](https://hub.docker.com/repository/docker/avannus/circuit-sim/general).
 
 Tested on Linux (x86_64/AMD64) and an M1 MacBook Air (ARM64).
 
