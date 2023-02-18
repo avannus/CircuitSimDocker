@@ -3,35 +3,42 @@
 
 set -e
 
-# function cleanup {
-#   echo -e "\n-----Cleaning up-----\n"
-#   echo -e "\n-----Done Cleaning-----\n"
-# }
-# trap cleanup EXIT
-
-DOCKER_REPO="avannus/circuit-sim"
-#ARCH is the architectures to build
+DOCKER_USER="avannus"
+DOCKER_REPO="$DOCKER_USER/circuit-sim"
 ARCH="linux/amd64,linux/arm64"
-#NO_CACHE is whether to use the cache when building the container
-NO_CACHE=""
-DOWNLOAD=false
-CircuitSimLinks=./CircuitSimLinks.txt
+DOWNLOAD_SOURCE="https://www.roiatalla.com/public/CircuitSim/Linux/"
+
+CircuitSimLinks=./CircuitSimLinks.txt # File to store links to CircuitSim
+NO_CACHE="" # Set to --no-cache to not use cache when building
+DOWNLOAD=false # Set to true to download all images after building
+NEW=true # Set to false to rebuild all images, even if they already exist
+
 
 # Help
-description="Build all containers"
-define() { IFS=$'\n' read -r -d '' "${1}" || true; }
-usage_text=""
-define usage_text <<'EOF'
+define(){ IFS='\n' read -r -d '' ${1} || true; }
+
+description="Build all versions of CircuitSim available and push all images to Docker Hub."
+
+define usage_text <<EOF
 USAGE:
-    ./buildAll.sh [-h|-c|-d]
+    ./buildAll.sh -h|-c|-d|-r|-A [buildx targets]|-U [dockerhub username]|-R <repo name>
 
 OPTIONS:
-    h, -h, --h, help, -help, --help
+    -h, --help
             Show this help text.
-    -c, -nc, --no-cache
-            Do not use the cache when building the container.
-    -d, --download
+    -c
+            Do not use cache when building each container.
+    -d
             Download all pushed containers
+    -r
+            Build and push all containers, even if they already exist
+CONFIG:
+    -A [buildx targets]
+            The architectures to build for. Script Default: $ARCH
+    -U [dockerhub username]
+            The user to push the images to. Script Default: $DOCKER_USER
+    -R [repo name]
+            The repository to push the images to. Script Default: $DOCKER_REPO
 EOF
 
 print_help() {
@@ -42,33 +49,59 @@ print_usage() {
   >&2 echo "$usage_text"
 }
 
-if [ $# -eq 0 ]; then
-  :
-elif [ $# -eq 1 ]; then
-  case "$1" in
-    h|-h|--h|help|-help|--help)
+# Parse arguments
+while getopts "hcdA:U:R:-:" opt; do
+  case $opt in
+    -)
+      case "${OPTARG}" in
+        help)
+          print_help
+          exit 0
+          ;;
+        *)
+          if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
+              echo "Unknown option --${OPTARG}" >&2
+              print_usage
+              exit 1
+          fi
+          ;;
+      esac;;
+    h)
       print_help
       exit 0
       ;;
-    -c|-nc|--no-cache)
+    c)
       NO_CACHE="--no-cache"
       ;;
-    -d|--download)
+    d)
       DOWNLOAD=true
       ;;
-    *)
-      >&2 echo "Error: unrecognized argument: $1"
-      >&2 echo ""
+    r)
+      NEW=false
+      ;;
+    A)
+      ARCH=$OPTARG
+      ;;
+    U)
+      DOCKER_USER=$OPTARG
+      ;;
+    R)
+      DOCKER_REPO=$OPTARG
+      ;;
+    \?)
+      echo "Unknown option: -$OPTARG" >&2
+      print_usage
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
       print_usage
       exit 1
       ;;
   esac
-else
-  >&2 echo "Error: too many arguments"
-  >&2 echo ""
-  print_usage
-  exit 1
-fi
+done
+
+echo $DOCKER_REPO
 
 # Ensure docker is installed
 if ! command -v docker &> /dev/null
@@ -84,20 +117,45 @@ then
   exit
 fi
 
+# Ensure user is logged in
+if ! docker info | grep -q "Username: $DOCKER_USER"; then
+  echo "Please login to docker as $DOCKER_USER or set the correct user with -U"
+  exit
+fi
+
+if ! command -v lynx &> /dev/null
+then
+  echo "lynx could not be found"
+  exit
+fi
+
+if ! command -v sed &> /dev/null
+then
+  echo "sed could not be found"
+  exit
+fi
+
+if ! command -v awk &> /dev/null
+then
+  echo "awk could not be found"
+  exit
+fi
+
 # Ensure any architechture can be built
 if ! docker buildx ls | grep -q "CircuitSimBuilder"; then
   echo -e "\n-----Creating CircuitSimBuilder with buildx-----\n"
   time docker buildx create --name CircuitSimBuilder --driver docker-container --bootstrap
 fi
 
-echo -e "\n-----Done init. dep. for build-----\n\n-----Starting Download of Links-----\n"
+echo -e "\n-----Done init. dep. for build-----\n\n-----Starting Download of Links from $DOWNLOAD_SOURCE-----\n"
 
 # Download links
-time lynx -dump https://www.roiatalla.com/public/CircuitSim/Linux/ | awk '/http/{print $2}' > $CircuitSimLinks
-time sed -i '1d' $CircuitSimLinks
+lynx -dump $DOWNLOAD_SOURCE | awk '/http/{print $2}' > $CircuitSimLinks
+sed -i '1d' $CircuitSimLinks # Remove first line (parent directory)
 links=$(cat $CircuitSimLinks)
 
-echo -e "\n-----Done Downloading Links-----\n\n-----Starting Builds-----\n"
+echo -e "\n-----Done Downloading Links-----\n"
+echo -e "\n-----Starting Builds-----\n"
 
 finalLink=""
 finalName=""
@@ -106,6 +164,17 @@ for link in $links
 do
   name=${link##*/}
   imageName="$DOCKER_REPO:$name"
+  if [ $NEW=true ]; then
+    echo -e "\n-----Checking if $name exists on Docker Hub-----"
+    if curl --silent -f -lSL https://hub.docker.com/v2/repositories/${DOCKER_USER}/circuit-sim/tags/{$name} > /dev/null; then
+      echo -e "-----Skipping $name, exists on Docker Hub-----\n"
+      continue
+    else
+      echo -e "-----$name not found on Docker Hub-----\n"
+    fi
+  else 
+    echo -e "\n-----Building all images-----\n"
+  fi
   echo -e "\n-----Starting Build of $name-----\n"
   time docker buildx build \
     --builder CircuitSimBuilder \
@@ -116,12 +185,8 @@ do
     --build-arg NAME=$name \
     . $NO_CACHE
   echo -e "\n-----Done Building $name-----\n"
-  if [ -z "$finalName" ] || [ $DOWNLOAD = true ]; then
-    if [ -z "$finalName" ]; then
-      echo -e "\n-----First image, pulling-----\n"
-    else
-      echo -e "\n-----Pulling image-----\n"
-    fi
+  if [ $DOWNLOAD = true ]; then
+    echo -e "\n-----Pulling image-----\n"
     time docker pull $imageName
     echo -e "\n-----Done pulling image, continuing-----\n"
   fi
@@ -129,14 +194,26 @@ do
   finalLink=$link
 done
 
-echo -e "\n-----Done Building, pulling final build-----\n"
-time docker pull $imageName
-echo -e "\n-----Done pulling final build-----\n"
+echo -e "\n-----Done Building-----\n"
 
-read -p "Have you tested this on both ARM64 and AMD64 and want to push $finalName to stable? [y/N] " -n 1 -r
+if [ finalName=="" ]; then
+  echo "No new images to push to stable, exiting"
+  exit 0
+fi
+
+read -p "Have you tested $finalName on both ARM64 and AMD64 and want to push $finalName to stable? [y/N] " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
+    echo "Exiting"
+    exit 0
+fi
+
+read -p "You're SURE that you tested $finalName on BOTH ARM64 and AMD64 and want to push $finalName to stable? [y/N] " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Exiting"
     exit 0
 fi
 
