@@ -18,5 +18,5 @@ ARG NAME
 # Download CircuitSim.
 RUN wget $LINK -O /CircuitSim
 
-# Set the name of the application.
+# Set the name for the GUI.
 RUN set-cont-env APP_NAME $NAME

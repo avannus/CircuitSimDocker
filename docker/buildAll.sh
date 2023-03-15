@@ -7,12 +7,14 @@ DOCKER_USER="avannus"
 DOCKER_REPO="$DOCKER_USER/circuit-sim"
 ARCH="linux/amd64,linux/arm64"
 DOWNLOAD_SOURCE="https://www.roiatalla.com/public/CircuitSim/Linux/"
+DOCKER_HUB_REPO="https://hub.docker.com/v2/repositories/$DOCKER_USER/circuit-sim/"
 
 CircuitSimLinks=./CircuitSimLinks.txt # File to store links to CircuitSim
 NO_CACHE="" # Set to --no-cache to not use cache when building
 DOWNLOAD=false # Set to true to download all images after building
-NEW=true # Set to false to rebuild all images, even if they already exist
+FORCE=false # Set to false to rebuild all images, even if they already exist
 
+# TODO push MAJOR, MAJOR.MINOR onto DockerHub for each maximum version (so people can get updates)
 
 # Help
 define(){ IFS='\n' read -r -d '' ${1} || true; }
@@ -21,7 +23,7 @@ description="Build all versions of CircuitSim available and push all images to D
 
 define usage_text <<EOF
 USAGE:
-    ./buildAll.sh -h|-c|-d|-r|-A [buildx targets]|-U [dockerhub username]|-R <repo name>
+    ./buildAll.sh -h|-c|-d|-f|-A <buildx targets>|-U <dockerhub username>|-R <repo name>
 
 OPTIONS:
     -h, --help
@@ -30,8 +32,8 @@ OPTIONS:
             Do not use cache when building each container.
     -d
             Download all pushed containers
-    -r
-            Build and push all containers, even if they already exist
+    -f
+            Foce build and push of all containers, even if they already exist
 CONFIG:
     -A [buildx targets]
             The architectures to build for. Script Default: $ARCH
@@ -76,8 +78,8 @@ while getopts "hcdA:U:R:-:" opt; do
     d)
       DOWNLOAD=true
       ;;
-    r)
-      NEW=false
+    f)
+      FORCE=true
       ;;
     A)
       ARCH=$OPTARG
@@ -104,41 +106,36 @@ done
 echo $DOCKER_REPO
 
 # Ensure docker is installed
-if ! command -v docker &> /dev/null
-then
+if ! command -v docker &> /dev/null; then
   echo "docker could not be found"
-  exit
+  exit 1
 fi
 
 # Ensure docker buildx is installed
-if ! command -v docker buildx &> /dev/null
-then
+if ! command -v docker buildx &> /dev/null; then
   echo "docker buildx could not be found"
-  exit
+  exit 1
 fi
 
 # Ensure user is logged in
 if ! docker info | grep -q "Username: $DOCKER_USER"; then
   echo "Please login to docker as $DOCKER_USER or set the correct user with -U"
-  exit
+  exit 1
 fi
 
-if ! command -v lynx &> /dev/null
-then
+if ! command -v lynx &> /dev/null; then
   echo "lynx could not be found"
-  exit
+  exit 1
 fi
 
-if ! command -v sed &> /dev/null
-then
+if ! command -v sed &> /dev/null; then
   echo "sed could not be found"
-  exit
+  exit 1
 fi
 
-if ! command -v awk &> /dev/null
-then
+if ! command -v awk &> /dev/null; then
   echo "awk could not be found"
-  exit
+  exit 1
 fi
 
 # Ensure any architechture can be built
@@ -160,13 +157,12 @@ echo -e "\n-----Starting Builds-----\n"
 finalLink=""
 finalName=""
 
-for link in $links
-do
+for link in $links; do
   name=${link##*/}
   imageName="$DOCKER_REPO:$name"
-  if [ $NEW=true ]; then
+  if [ $force=false ]; then
     echo -e "\n-----Checking if $name exists on Docker Hub-----"
-    if curl --silent -f -lSL https://hub.docker.com/v2/repositories/${DOCKER_USER}/circuit-sim/tags/{$name} > /dev/null; then
+    if curl --silent -f -lSL {$DOCKER_HUB_REPO}tags/{$name} > /dev/null; then
       echo -e "-----Skipping $name, exists on Docker Hub-----\n"
       continue
     else
@@ -203,16 +199,14 @@ fi
 
 read -p "Have you tested $finalName on both ARM64 and AMD64 and want to push $finalName to stable? [y/N] " -n 1 -r
 echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]
-then
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Exiting"
     exit 0
 fi
 
 read -p "You're SURE that you tested $finalName on BOTH ARM64 and AMD64 and want to push $finalName to stable? [y/N] " -n 1 -r
 echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]
-then
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Exiting"
     exit 0
 fi
