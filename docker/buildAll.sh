@@ -6,8 +6,8 @@ set -e
 DOCKER_USER="avannus"
 DOCKER_REPO="$DOCKER_USER/circuit-sim"
 ARCH="linux/amd64,linux/arm64"
-DOWNLOAD_SOURCE="https://www.roiatalla.com/public/CircuitSim/Linux/"
-DOCKER_HUB_REPO="https://hub.docker.com/v2/repositories/$DOCKER_USER/circuit-sim/"
+DOWNLOAD_SOURCE="https://www.roiatalla.com/public/CircuitSim/Linux"
+DOCKER_REPO_LINK="https://hub.docker.com/v2/repositories/$DOCKER_REPO"
 
 CircuitSimLinks=./CircuitSimLinks.txt # File to store links to CircuitSim
 NO_CACHE="" # Set to --no-cache to not use cache when building
@@ -154,15 +154,13 @@ links=$(cat $CircuitSimLinks)
 echo -e "\n-----Done Downloading Links-----\n"
 echo -e "\n-----Starting Builds-----\n"
 
-finalLink=""
-finalName=""
-
 for link in $links; do
   name=${link##*/}
   imageName="$DOCKER_REPO:$name"
+
   if [ $force=false ]; then
     echo -e "\n-----Checking if $name exists on Docker Hub-----"
-    if curl --silent -f -lSL {$DOCKER_HUB_REPO}tags/{$name} > /dev/null; then
+    if curl --silent -f -lSL {$DOCKER_REPO_LINK}tags/{$name} > /dev/null; then
       echo -e "-----Skipping $name, exists on Docker Hub-----\n"
       continue
     else
@@ -171,7 +169,7 @@ for link in $links; do
   else 
     echo -e "\n-----Building all images-----\n"
   fi
-  echo -e "\n-----Starting Build of $name-----\n"
+  echo -e "\n-----Starting Build and Push of $name-----\n"
   time docker buildx build \
     --builder CircuitSimBuilder \
     --platform $ARCH \
@@ -186,25 +184,28 @@ for link in $links; do
     time docker pull $imageName
     echo -e "\n-----Done pulling image, continuing-----\n"
   fi
-  finalName=$name
-  finalLink=$link
+
+  prevName=$name
+  prevLink=$link
+  prevMajor=$currMajor
+  prevMinor=$currMinor
 done
 
 echo -e "\n-----Done Building-----\n"
 
-if [ finalName=="" ]; then
+if [ name="" ]; then
   echo "No new images to push to stable, exiting"
   exit 0
 fi
 
-read -p "Have you tested $finalName on both ARM64 and AMD64 and want to push $finalName to stable? [y/N] " -n 1 -r
+read -p "Have you tested $name on both ARM64 and AMD64 and want to push $name to stable? [y/N] " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Exiting"
     exit 0
 fi
 
-read -p "You're SURE that you tested $finalName on BOTH ARM64 and AMD64 and want to push $finalName to stable? [y/N] " -n 1 -r
+read -p "You're SURE that you tested $name on BOTH ARM64 and AMD64 and want to push $name to stable? [y/N] " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Exiting"
@@ -212,8 +213,8 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 echo -e "\n-----Starting Push to Stable-----\n"
-link=$finalLink
-name=$finalName
+link=$link
+name=$name
 imageName="$DOCKER_REPO:stable"
 time docker buildx build \
   --builder CircuitSimBuilder \
